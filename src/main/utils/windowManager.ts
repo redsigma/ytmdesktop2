@@ -1,6 +1,6 @@
 import { logger } from "@shared/utils/console";
 import translations from "@translations/index";
-import { BrowserWindow, BrowserWindowConstructorOptions, WebContentsView } from "electron";
+import { BrowserWindow, BrowserWindowConstructorOptions, WebContentsView, shell } from "electron";
 import { debounce } from "lodash-es";
 import { join } from "path";
 import appIconPath from "~/build/favicon.ico?asset";
@@ -81,6 +81,13 @@ export class WindowManager {
 		await this.setupViews();
 		this.setupWindowEvents();
 		await this.initializeWindowState(bounds);
+
+		this.mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+			if (url.startsWith("http")) {
+				shell.openExternal(url);
+			}
+			return { action: "deny" };
+		});
 
 		return createWindowContext({
 			main: this.mainWindow,
