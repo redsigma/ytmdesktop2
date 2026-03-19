@@ -2,7 +2,6 @@ import { AfterInit, BaseProvider, BeforeStart } from "@main/utils/baseProvider";
 import { isDevelopment, isProduction } from "@main/utils/devUtils";
 import { IpcContext, IpcHandle, IpcOn } from "@main/utils/onIpcEvent";
 import { createAppWindow } from "@main/utils/windowUtils";
-import { authorName, compareUrlParse } from "@shared/utils/github";
 import { App, BrowserWindow } from "electron";
 import { autoUpdater, CancellationToken, UpdateInfo } from "electron-updater";
 import { clamp } from "lodash-es";
@@ -13,32 +12,6 @@ import SettingsProvider from "./settings.service";
 const devShowUpdateDialog = isDevelopment && process.env.DEV_SHOW_UPDATE_DIALOG === "1";
 if (isDevelopment) import.meta.env.__SKIP_BUILD == null;
 const [GITHUB_AUTHOR, GITHUB_REPOSITORY] = import.meta.env.VITE_GITHUB_REPOSITORY.split("/", 2);
-function getContent(content: string) {
-	const lines = content.split("\n");
-	const newContext = lines.map((line) => {
-		if (line.startsWith("- ")) {
-			const mainContent = line.split(";")[0];
-			const context = line.split(";")[2] ?? "@" + authorName;
-			const mentions = context
-				?.split(" ")
-				.filter((word) => word.startsWith("@"))
-				.map((mention) => {
-					const username = mention.replace("@", "");
-					const avatarUrl = `https://github.com/${username}.png`;
-					return `[![${mention}](${avatarUrl})](https://github.com/${username})`;
-				});
-			if (!mentions) {
-				return line;
-			}
-			// Remove &nbsp
-			return mainContent.replace(/&nbsp/g, "") + " – " + mentions.join(" ");
-		} else if (compareUrlParse.test(line)) {
-			return line.replace(compareUrlParse, `[View on Github]($1)`);
-		}
-		return line;
-	});
-	return newContext.join("\n");
-}
 @IpcContext
 export default class UpdateProvider extends BaseProvider implements BeforeStart, AfterInit {
 	private _update: UpdateInfo | null = null;
@@ -106,13 +79,6 @@ export default class UpdateProvider extends BaseProvider implements BeforeStart,
 		this.sendToAllViews(IPC_EVENT_NAMES.APP_UPDATE_CHECKING, checking);
 	}
 	private async parseUpdateInfo(ev: UpdateInfo) {
-		// todo: add release notes
-		// const releaseNotes = await cacheWithFile(async () => {
-		// 	return await fetch(apiRepoUrl + `/releases/tags/v${ev.version}`)
-		// 		.then((res) => res.json())
-		// 		.then((res) => res.body)
-		// 		.then(getContent);
-		// }, `version-${ev.version}`);
 
 		return {
 			...ev,
