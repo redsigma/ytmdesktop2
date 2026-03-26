@@ -79,7 +79,6 @@ export default class UpdateProvider extends BaseProvider implements BeforeStart,
 		this.sendToAllViews(IPC_EVENT_NAMES.APP_UPDATE_CHECKING, checking);
 	}
 	private async parseUpdateInfo(ev: UpdateInfo) {
-
 		return {
 			...ev,
 			releaseNotes: ev.releaseNotes,
