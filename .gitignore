@@ -29,5 +29,4 @@ pnpm-debug.log*
 /dist_electron*
 /.VSCodeCounter
 /*config*.mjs
-
 /*.node
