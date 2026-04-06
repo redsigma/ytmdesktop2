@@ -7,6 +7,7 @@ import IPC_EVENT_NAMES, { API_ROUTES } from "../utils/eventNames";
 import TrackProvider from "./track.service";
 
 type TrackControlResponse = { isPlaying: boolean, time: number };
+const FORMATTED_API_ROUTES = Object.values(API_ROUTES).map((x) => x.replace(/^\/?api\//, ""));
 @IpcContext
 export default class ApiProvider extends BaseProvider implements AfterInit {
 	private _thread?: ApiWorker;
@@ -69,7 +70,7 @@ export default class ApiProvider extends BaseProvider implements AfterInit {
 
 	@IpcHandle("api/routes")
 	async getRoutes() {
-		return Object.values(API_ROUTES).map((x) => x.replace(/^\/?api\//, ""));
+		return FORMATTED_API_ROUTES;
 	}
 
 	@IpcHandle(API_ROUTES.TRACK_CURRENT)
